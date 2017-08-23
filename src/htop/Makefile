@@ -28,7 +28,7 @@ BUILD 			:= x86_64-linux-gnu
 TARGET_SYSTEM   := x1800
 
 ifeq ($(TARGET_SYSTEM), x1800)
-	MIPS_GCC 	:= /home/uos/office/ingenic/gcc/mips-gcc520-32bit/bin/mips-linux-gnu-
+	MIPS_GCC 	:= /home/uso/Desktop/mips-gcc520-32bit/bin/mips-linux-gnu-
 	HOST        := mips-linux-gnu
 else
 	HOST 		:= $(BUILD)

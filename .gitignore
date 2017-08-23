@@ -54,3 +54,10 @@ dkms.conf
 
 # ignore the specified files and directories
 node_modules/
+build/
+install/
+
+# htop
+src/htop/htop/
+src/htop/ncurses/
+
