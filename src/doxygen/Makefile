@@ -58,6 +58,7 @@ all: clean doxygen doxygen-install
 	@echo "------------------------------------"
 
 clean:
+	@rm -rf $(TARGET)
 	@rm -rf $(BUILD_DIR)
 	@rm -rf $(INSTALL)
 
@@ -67,11 +68,17 @@ clean:
 doxygen: doxygen-config
 	cd $(BUILD_HTOP) && make -j $(PARALLEL_JOBS)
 
-doxygen-config:
+doxygen-config: doxygen-src-download
 	@mkdir -p $(BUILD_HTOP)
 	cd $(TARGET) && git checkout -b Release_1_8_13 Release_1_8_13
 	cd $(BUILD_HTOP) && \
 		cmake -G "Unix Makefiles" $(SRC_DIR) -DCMAKE_INSTALL_PREFIX=$(INSTALL)
+
+doxygen-src-download:
+	@echo "--------------------"
+	@echo "download the doxygen"
+	@echo "--------------------"
+	git clone https://github.com/doxygen/doxygen.git
 
 doxygen-install:
 	@mkdir -p $(PREFIX)
