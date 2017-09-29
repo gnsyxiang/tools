@@ -60,4 +60,5 @@ install/
 # htop
 src/htop/htop/
 src/htop/ncurses/
+src/valgrind/valgrind/
 
