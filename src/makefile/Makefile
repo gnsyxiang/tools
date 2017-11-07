@@ -57,8 +57,8 @@ LDFLAGS := $(LD_PATH) $(LD_LIBS)
 # c files
 # -------
 SRC_C := $(wildcard $(SRC_DIR)/*/*.c)
-OBJ_C := $(patsubst %.c, $(OBJ_DIR)/%.o, $(SRC_C))
-DEP_C := $(patsubst %.c, $(OBJ_DIR)/%.d, $(SRC_C))
+OBJ_C := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.o, $(SRC_C))
+DEP_C := $(patsubst $(SRC_DIR)/%.c, $(OBJ_DIR)/%.d, $(SRC_C))
 DEPS  ?= $(DEP_C)
 OBJS  ?= $(OBJ_C)
 
@@ -73,12 +73,12 @@ $(TARGET): $(OBJS)
 #
 # make *.c
 #
-$(OBJ_C): $(OBJ_DIR)/%.o : %.c
+$(OBJ_C): $(OBJ_DIR)/%.o : $(SRC_DIR)/%.c
 	$(MKDIR) $(dir $@)
 	$(ECHO) $(MSG_CC) $<
 	$(CC) -c $(CFLAGS) $< -o $@
 
-$(DEP_C): $(OBJ_DIR)/%.d : %.c
+$(DEP_C): $(OBJ_DIR)/%.d : $(SRC_DIR)/%.c
 	$(MKDIR) $(dir $@);
 	$(CC) -MM $(CFLAGS) -MT $(@:%.d=%.o) $< >$@
 
