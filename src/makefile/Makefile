@@ -18,7 +18,9 @@ SRC_DIR ?= src
 
 TARGET ?= cunit-code
 
+#--------
 #
+#--------
 Q := @
 RM 		:= $(Q)rm -rf
 ECHO 	:= $(Q)echo
@@ -27,24 +29,49 @@ LN 		:= $(Q)ln -s
 CP 		:= $(Q)cp -ar
 MSG_LD 	:= LD
 
-#
+# --------
 # compiler
-#
-GCC_PATH := ~/Desktop/mips-gcc520-32bit/bin
-GCC_NAME := mips-linux-gnu-
+# --------
+# TARGET_SYSTEM   := x1800
+
+ifeq ($(TARGET_SYSTEM), x1800)
+	GCC_PATH := ~/office/ingenic/gcc/mips-gcc520-32bit/bin
+	GCC_NAME := mips-linux-gnu-
+else
+endif
 
 # CROSS_TOOL := $(GCC_PATH)/$(GCC_NAME)
 
-CC := $(Q)$(CROSS_TOOL)gcc
+AR 	    := $(Q)$(CROSS_TOOL)ar
+AS 	    := $(Q)$(CROSS_TOOL)as
+LD 	    := $(Q)$(CROSS_TOOL)ld
+NM 	    := $(Q)$(CROSS_TOOL)nm
+CC 	    := $(Q)$(CROSS_TOOL)gcc
+GCC     := $(Q)$(CROSS_TOOL)gcc
+CPP     := $(Q)$(CROSS_TOOL)cpp
+CXX     := $(Q)$(CROSS_TOOL)g++
+FC      := $(Q)$(CROSS_TOOL)gfortran
+F77     := $(Q)$(CROSS_TOOL)gfortran
+RANLIB  := $(Q)$(CROSS_TOOL)ranlib
+READELF := $(Q)$(CROSS_TOOL)readelf
+STRIP   := $(Q)$(CROSS_TOOL)strip
+OBJCOPY := $(Q)$(CROSS_TOOL)objcopy
+OBJDUMP := $(Q)$(CROSS_TOOL)objdump
 
-#
+# ---------------
 # Compile options
-#
-C_DBG := -g
-C_NODBG := -O2
+# ---------------
+
+DEBUG_CONTROL := debug
+
+ifeq ($(DEBUG_CONTROL)X, debugX)
+	C_DBG := -g
+else
+	C_DBG := -O2
+endif
 C_INC := -I. -I../install/cunit-code/include
 
-CFLAGS := $(C_INC)
+CFLAGS := $(C_INC) $(C_DBG)
 
 #
 # link options
