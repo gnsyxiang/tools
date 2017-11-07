@@ -58,6 +58,7 @@ STRIP   := $(Q)$(CROSS_TOOL)strip
 OBJCOPY := $(Q)$(CROSS_TOOL)objcopy
 OBJDUMP := $(Q)$(CROSS_TOOL)objdump
 
+PARALLEL_JOBS=`getconf _NPROCESSORS_ONLN`
 # ---------------
 # Compile options
 # ---------------
