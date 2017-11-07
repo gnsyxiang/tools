@@ -61,4 +61,4 @@ install/
 src/htop/htop/
 src/htop/ncurses/
 src/valgrind/valgrind/
-
+src/cunit/cunit-code/
