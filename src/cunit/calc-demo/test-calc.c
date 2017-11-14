@@ -1,6 +1,26 @@
+/****************************************************************
+ * Filename: test-calc.c
+ * -------------------------------
+ * Copyright(C),
+ * Author: zhenquan.qiu
+ * Version: V1.0.0
+ * Last modified: 14/11 2017 05:08
+ * Description:
+ * 
+ * Change Log:
+ * NO.	Author		    Date		Modified
+ * 00	zhenquan.qiu	14/11 2017
+ ****************************************************************/
 #include <stdio.h>
 #include <assert.h>
-#include "CUnit/Basic.h"
+#include <stdlib.h>
+
+#include <CUnit/Basic.h>
+#include <CUnit/Console.h>
+#include <CUnit/CUnit.h>
+#include <CUnit/TestDB.h>
+#include <CUnit/Automated.h>
+
 #include "calc.h"
 
 int calc_is_equal(int a, int b, int real)
@@ -46,13 +66,38 @@ CU_SuiteInfo suites[] = {
     CU_SUITE_INFO_NULL
 };
 
-int calc_add_suite()
+void calc_add_suite(void)
 {
-    CU_pSuite pSuite = NULL;
+    assert(NULL != CU_get_registry());
+    assert(!CU_is_test_running());
 
-    if(CUE_SUCCESS != CU_register_suites(suites)) {
-        return 1;
+    if (CUE_SUCCESS != CU_register_suites(suites)) {
+        exit(EXIT_FAILURE);
     }
+}
 
-    return 0;
+int calc_run_suite(void)
+{
+    if (CU_initialize_registry()) {
+        fprintf(stderr, " Initialization of Test Registry failed. ");
+        exit(EXIT_FAILURE);
+    } else {
+        calc_add_suite();
+
+        /* 直接输出测试结果 */
+        CU_basic_set_mode(CU_BRM_VERBOSE);
+        CU_basic_run_tests();
+
+        /* 交互式的输出测试结果 */
+        /* CU_console_run_tests(); */
+
+        /* 自动生成xml等文件 */
+        /* CU_set_output_filename("TestMax"); */
+        /* CU_list_tests_to_file(); */
+        /* CU_automated_run_tests(); */
+
+        CU_cleanup_registry();
+
+        return CU_get_error();
+    }
 }
