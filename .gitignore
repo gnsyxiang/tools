@@ -57,8 +57,9 @@ node_modules/
 build/
 install/
 
-# htop
 src/htop/htop/
 src/htop/ncurses/
 src/valgrind/valgrind/
+src/cunit/cunit-code/
 
+*.xml
