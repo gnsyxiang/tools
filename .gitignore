@@ -63,3 +63,5 @@ src/valgrind/valgrind/
 src/cunit/cunit-code/
 
 *.xml
+*.js
+calc
