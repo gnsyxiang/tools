@@ -39,7 +39,12 @@ study-htop
   LDFLAGS=-L$(PREFIX)/lib \
   CPPFLAGS=-I$(PREFIX)/include
   ```
+> note: 指定上面的路径之后，还是提示相同的错误，解决如下：
 
+```
+  因为htop2.0之后使用ncurses-6.0库文件，并且检查的库文件名为libncurses6.so，
+  但是在生成目录并没有，所以只需自己建立一个软连接就可以解决对应问题。
+```
 
 ### 缺少terminfo环境变量
 
