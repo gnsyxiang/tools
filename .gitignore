@@ -65,3 +65,6 @@ src/cunit/cunit-code/
 *.xml
 *.js
 calc
+
+*.swp
+src/common-library/zlib/
