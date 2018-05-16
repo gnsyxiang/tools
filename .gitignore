@@ -62,7 +62,8 @@ src/htop/ncurses/
 src/valgrind/valgrind/
 src/cunit/cunit-code/
 src/common-library/zlib/
-src/common-library/libffi/
+src/gtk+/glib/
+src/gtk+/libffi/
 
 *.xml
 *.js
