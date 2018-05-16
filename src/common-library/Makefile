@@ -18,75 +18,75 @@
 #     last modified: 15/05 2018 14:08
 # ===============================================================
 
+# scale the maximum concurrency with the number of CPUs.
+# # An additional job is used in order to keep processors busy
+# # If the number of processors is not available, assume one.
+PARALLEL_JOBS 	:= $(shell echo $$((1 + `getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1`)))
 
-#GCC_PATH 	:= ~/office/xiaomi/gcc/toolchain-sunxi-musl/toolchain/bin/
-#GCC_NAME 	:= arm-openwrt-linux-
+HOSTMAKE  		:= $(shell which make || echo make)
+MAKE1  			:= $(HOSTMAKE) -j1
+MAKE 			:= $(HOSTMAKE) -j$(PARALLEL_JOBS)
 
-GCC_PATH 	:= ~/office/ingenic/gcc/mips-gcc520-32bit/bin
-GCC_NAME 	:= mips-linux-gnu-
+BUILD 			:= x86_64-linux-gnu
+TARGET_SYSTEM   := x1800
+
+ifeq ($(TARGET_SYSTEM), x1800)
+	GCC_PATH 	:= /home/uos/office/ingenic/gcc/mips-gcc520-32bit/bin
+	GCC_NAME 	:= mips-linux-gnu-
+
+	HOST        := mips-linux-gnu
+else
+	HOST 		:= $(BUILD)
+endif
 
 CROSS_TOOL 	:= $(GCC_PATH)/$(GCC_NAME)
 CC 	 		:= $(CROSS_TOOL)gcc
 CXX 		:= $(CROSS_TOOL)g++
 STRIP  		:= $(CROSS_TOOL)strip
 
-
-# zlib
-ZLIB_DIR 	:= zlib
-ZLIB_INFO 	:= download zlib src
-ZLIB_NEW_RELEASE 	:= v1.2.9
-ZLIB_GIT_PATH 	 	:= https://github.com/madler/zlib.git
-
-# libffi
-LIBFFI_DIR 	:= libffi
-LIBFFI_INFO := download libffi src
-LIBFFI_NEW_RELEASE 	:= v3.2.1
-LIBFFI_GIT_PATH   	:= https://github.com/libffi/libffi.git
-
-
 # 
 ECHO 	:= echo
 RM 		:= rm -rf
 MKDIR 	:= mkdir -p
+DOWNLOAD_INFO := download src
 
-BUILD 	:= build
-INSTALL := install
+ROOT 		:= $(shell pwd)
+BUILD_DIR 	:= $(ROOT)/build
+INSTALL_DIR := $(ROOT)/install
 
+PREFIX  := $(INSTALL_DIR)
 
+#################################################################
+ZLIB_DIR 	:= zlib
+ZLIB_NEW_RELEASE 	:= v1.2.9
+ZLIB_GIT_PATH 	 	:= https://github.com/madler/zlib.git
+#################################################################
 
-
-
-
-#all: $(ZLIB_DIR) $(LIBFFI_DIR)
 all: prepare $(ZLIB_DIR)
 
 prepare:
-	$(MKDIR) $(BUILD) $(INSTALL)
-	$(MKDIR) $(BUILD)/$(ZLIB_DIR)
+	$(MKDIR) $(BUILD_DIR) $(INSTALL_DIR)
+	$(MKDIR) $(BUILD_DIR)/$(ZLIB_DIR)
 
-# zlib
-$(ZLIB_DIR): $(ZLIB_DIR)-src $(ZLIB_DIR)-configure $(ZLIB_DIR)-make
+######################################
+#
+# zlib: 用来支持数据压缩或解压的函数库
+#
+######################################
+$(ZLIB_DIR): $(ZLIB_DIR)-src $(ZLIB_DIR)-make
 
 $(ZLIB_DIR)-make:
-	cd $(BUILD)/$(ZLIB_DIR) \
-		&& export CC=$(CC) \
-		&& export CXX=$(CXX) \
-		&& ../../zlib/configure --prefix=../../$(INSTALL) \
-		&& make \
-		&& make install
+	cd $(BUILD_DIR)/$(@:-make=) \
+		&& export CC=$(CC) export CXX=$(CXX) \
+		&& $(ROOT)/$(@:-make=)/configure --prefix=$(PREFIX) \
+		&& $(MAKE) && make install
 	
-$(ZLIB_DIR)-configure:
-
 $(ZLIB_DIR)-src:
-	$(ECHO) $(ZLIB_INFO)
+	$(ECHO) $(DOWNLOAD_INFO)
+ifneq ($(ZLIB_DIR), $(wildcard $(ZLIB_DIR)))
 	git clone $(ZLIB_GIT_PATH)
-	cd $(ZLIB_DIR) && git co -b dev $(ZLIB_NEW_RELEASE)
-
-# libffi
-$(LIBFFI_DIR):
-	$(ECHO) $(LIBFFI_INFO)
-	git clone $(LIBFFI_GIT_PATH)
-	cd $(LIBFFI_DIR) && git co -b dev $(LIBFFI_NEW_RELEASE)
+	cd $(@:-src=) && git co -b dev $(ZLIB_NEW_RELEASE)
+endif
 
 #################################################
 err_no_targets:
@@ -101,10 +101,10 @@ endif
 #################################################
 
 clean:
-	$(RM) $(BUILD) $(INSTALL)
+	$(RM) $(BUILD_DIR) $(INSTALL_DIR)
 
 distclean: clean
-	$(RM) $(ZLIB_DIR) $(LIBFFI_DIR)
+	$(RM) $(ZLIB_DIR)
 
 .PHONY: all clean distclean
 

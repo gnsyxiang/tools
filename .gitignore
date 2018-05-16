@@ -61,10 +61,11 @@ src/htop/htop/
 src/htop/ncurses/
 src/valgrind/valgrind/
 src/cunit/cunit-code/
+src/common-library/zlib/
+src/common-library/libffi/
 
 *.xml
 *.js
-calc
-
 *.swp
-src/common-library/zlib/
+
+calc
