@@ -28,7 +28,8 @@ MAKE1  			:= $(HOSTMAKE) -j1
 MAKE 			:= $(HOSTMAKE) -j$(PARALLEL_JOBS)
 
 BUILD 			:= x86_64-linux-gnu
-TARGET_SYSTEM   := x1800
+#TARGET_SYSTEM   := x1800
+TARGET_SYSTEM   := r16
 
 ifeq ($(TARGET_SYSTEM), x1800)
 	GCC_PATH 	:= /home/uos/office/ingenic/gcc/mips-gcc520-32bit/bin
@@ -36,7 +37,14 @@ ifeq ($(TARGET_SYSTEM), x1800)
 
 	HOST        := mips-linux-gnu
 else
+ifeq ($(TARGET_SYSTEM), r16)
+	GCC_PATH 	:= /home/uos/office/xiaomi/gcc/toolchain-sunxi-musl/toolchain/bin
+	GCC_NAME 	:= arm-openwrt-linux-
+
+	HOST        := arm-linux
+else
 	HOST 		:= $(BUILD)
+endif
 endif
 
 CROSS_TOOL 	:= $(GCC_PATH)/$(GCC_NAME)
@@ -48,6 +56,8 @@ STRIP  		:= $(CROSS_TOOL)strip
 ECHO 	:= echo
 RM 		:= rm -rf
 MKDIR 	:= mkdir -p
+WGET   	:= wget
+TAR 	:= tar
 DOWNLOAD_INFO := download src
 
 ROOT 		:= $(shell pwd)
@@ -60,13 +70,33 @@ PREFIX  := $(INSTALL_DIR)
 ZLIB_DIR 	:= zlib
 ZLIB_NEW_RELEASE 	:= v1.2.9
 ZLIB_GIT_PATH 	 	:= https://github.com/madler/zlib.git
+
+ALSA_LIB_NEW_RELEASE 	:= alsa-lib-1.1.6
+ALSA_LIB_FTP_PATH 		:= ftp://ftp.alsa-project.org/pub/lib/
 #################################################################
 
-all: prepare $(ZLIB_DIR)
+all: prepare $(ZLIB_DIR) $(ALSA_LIB_NEW_RELEASE)
 
 prepare:
 	$(MKDIR) $(BUILD_DIR) $(INSTALL_DIR)
-	$(MKDIR) $(BUILD_DIR)/$(ZLIB_DIR)
+
+$(ALSA_LIB_NEW_RELEASE): $(ALSA_LIB_NEW_RELEASE)-src $(ALSA_LIB_NEW_RELEASE)-make
+
+$(ALSA_LIB_NEW_RELEASE)-make:
+	$(MKDIR) $(BUILD_DIR)/$(@:-make=)
+	echo hahah
+	cd $(BUILD_DIR)/$(@:-make=) \
+		&& $(ROOT)/$(@:-make=)/configure --host=$(HOST) --prefix=$(PREFIX) CC=$(CC) --enable-shared --disable-python \
+		&& $(MAKE) && make install \
+		&& $(STRIP) --strip-unneeded $(INSTALL_DIR)/lib/libasound.so.2.0.0
+
+$(ALSA_LIB_NEW_RELEASE)-src:
+	$(ECHO) $(DOWNLOAD_INFO)
+ifneq ($(ALSA_LIB_NEW_RELEASE), $(wildcard $(ALSA_LIB_NEW_RELEASE)))
+	$(WGET) $(ALSA_LIB_FTP_PATH)/$(@:-src=).tar.bz2
+	$(TAR) -xjvf $(@:-src=).tar.bz2
+	$(RM) $(@:-src=).tar.bz2
+endif
 
 ######################################
 #
@@ -76,10 +106,12 @@ prepare:
 $(ZLIB_DIR): $(ZLIB_DIR)-src $(ZLIB_DIR)-make
 
 $(ZLIB_DIR)-make:
+	$(MKDIR) $(BUILD_DIR)/$(@:-make=)
 	cd $(BUILD_DIR)/$(@:-make=) \
 		&& export CC=$(CC) export CXX=$(CXX) \
 		&& $(ROOT)/$(@:-make=)/configure --prefix=$(PREFIX) \
-		&& $(MAKE) && make install
+		&& $(MAKE) && make install \
+		&& $(STRIP) --strip-unneeded $(INSTALL_DIR)/lib/libz.so.1.2.9
 	
 $(ZLIB_DIR)-src:
 	$(ECHO) $(DOWNLOAD_INFO)
@@ -104,7 +136,7 @@ clean:
 	$(RM) $(BUILD_DIR) $(INSTALL_DIR)
 
 distclean: clean
-	$(RM) $(ZLIB_DIR)
+	$(RM) $(ZLIB_DIR) $(ALSA_LIB_NEW_RELEASE)
 
 .PHONY: all clean distclean
 

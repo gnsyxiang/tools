@@ -61,9 +61,11 @@ src/htop/htop/
 src/htop/ncurses/
 src/valgrind/valgrind/
 src/cunit/cunit-code/
-src/common-library/zlib/
 src/gtk+/glib/
 src/gtk+/libffi/
+
+src/common-library/zlib/
+src/common-library/alsa-lib-1.1.6/
 
 *.xml
 *.js
