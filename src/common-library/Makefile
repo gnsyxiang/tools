@@ -18,66 +18,21 @@
 #     last modified: 15/05 2018 14:08
 # ===============================================================
 
-# scale the maximum concurrency with the number of CPUs.
-# # An additional job is used in order to keep processors busy
-# # If the number of processors is not available, assume one.
-PARALLEL_JOBS 	:= $(shell echo $$((1 + `getconf _NPROCESSORS_ONLN 2>/dev/null || echo 1`)))
+include ../../configs/com-var-def.mk
+include ../../configs/com-ruler-def.mk
 
-HOSTMAKE  		:= $(shell which make || echo make)
-MAKE1  			:= $(HOSTMAKE) -j1
-MAKE 			:= $(HOSTMAKE) -j$(PARALLEL_JOBS)
-
-BUILD 			:= x86_64-linux-gnu
-#TARGET_SYSTEM   := x1800
-TARGET_SYSTEM   := r16
-
-ifeq ($(TARGET_SYSTEM), x1800)
-	GCC_PATH 	:= /home/uos/office/ingenic/gcc/mips-gcc520-32bit/bin
-	GCC_NAME 	:= mips-linux-gnu-
-
-	HOST        := mips-linux-gnu
-else
-ifeq ($(TARGET_SYSTEM), r16)
-	GCC_PATH 	:= /home/uos/office/xiaomi/gcc/toolchain-sunxi-musl/toolchain/bin
-	GCC_NAME 	:= arm-openwrt-linux-
-
-	HOST        := arm-linux
-else
-	HOST 		:= $(BUILD)
-endif
-endif
-
-CROSS_TOOL 	:= $(GCC_PATH)/$(GCC_NAME)
-CC 	 		:= $(CROSS_TOOL)gcc
-CXX 		:= $(CROSS_TOOL)g++
-STRIP  		:= $(CROSS_TOOL)strip
-
-# 
-ECHO 	:= echo
-RM 		:= rm -rf
-MKDIR 	:= mkdir -p
-WGET   	:= wget
-TAR 	:= tar
-DOWNLOAD_INFO := download src
-
-ROOT 		:= $(shell pwd)
-BUILD_DIR 	:= $(ROOT)/build
-INSTALL_DIR := $(ROOT)/install
-
-PREFIX  := $(INSTALL_DIR)
-
-#################################################################
 ZLIB_DIR 	:= zlib
 ZLIB_NEW_RELEASE 	:= v1.2.9
 ZLIB_GIT_PATH 	 	:= https://github.com/madler/zlib.git
 
 ALSA_LIB_NEW_RELEASE 	:= alsa-lib-1.1.6
 ALSA_LIB_FTP_PATH 		:= ftp://ftp.alsa-project.org/pub/lib/
-#################################################################
 
+#################################################################
 all: prepare $(ZLIB_DIR) $(ALSA_LIB_NEW_RELEASE)
 
 prepare:
+	$(MAKE1) clean
 	$(MKDIR) $(BUILD_DIR) $(INSTALL_DIR)
 
 $(ALSA_LIB_NEW_RELEASE): $(ALSA_LIB_NEW_RELEASE)-src $(ALSA_LIB_NEW_RELEASE)-make
