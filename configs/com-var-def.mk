@@ -44,7 +44,8 @@ MKDIR 	:= mkdir -p
 LN 		:= ln -s
 CP 		:= cp -ar
 WGET   	:= wget
-TAR 	:= tar
+TAR_GZ 	:= tar -xzvf
+TAR_BZ2 := tar -xjvf
 
 ADB_SHELL := adb shell
 ADB_PUSH  := adb push
@@ -84,6 +85,7 @@ ifeq ($(TARGET_SYSTEM), x1800)
 	GCC_PATH 	:= /home/uos/office/ingenic/gcc/mips-gcc520-32bit/bin
 	GCC_NAME 	:= mips-linux-gnu-
 	HOST        := mips-linux-gnu
+	PROGRAM_PREFIX 	:= mipsel-linux-
 
 	CROSS_TOOL 	:= $(GCC_PATH)/$(GCC_NAME)
 
@@ -93,6 +95,7 @@ else
 		GCC_PATH 	:= /home/uos/office/xiaomi/gcc/toolchain-sunxi-musl/toolchain/bin
 		GCC_NAME 	:= arm-openwrt-linux-
 		HOST        := arm-linux
+		PROGRAM_PREFIX 	:= arm-linux-
 
 		CROSS_TOOL 	:= $(GCC_PATH)/$(GCC_NAME)
 		CFLAGS 		+= -DNO_backtrace

@@ -39,7 +39,6 @@ $(ALSA_LIB_NEW_RELEASE): $(ALSA_LIB_NEW_RELEASE)-src $(ALSA_LIB_NEW_RELEASE)-mak
 
 $(ALSA_LIB_NEW_RELEASE)-make:
 	$(MKDIR) $(BUILD_DIR)/$(@:-make=)
-	echo hahah
 	cd $(BUILD_DIR)/$(@:-make=) \
 		&& $(ROOT)/$(@:-make=)/configure --host=$(HOST) --prefix=$(PREFIX) CC=$(CC) --enable-shared --disable-python \
 		&& $(MAKE) && make install \
