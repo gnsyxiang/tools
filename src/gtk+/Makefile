@@ -66,13 +66,39 @@ LIBFFI_DIR 	:= libffi
 LIBFFI_NEW_RELEASE 	:= v3.2.1
 LIBFFI_GIT_PATH   	:= https://github.com/libffi/libffi.git
 
-#all: prepare $(LIBFFI_DIR) $(GLIB_DIR)
-all: prepare $(GLIB_DIR)
+UTIL_LINUX_DIR := util-linux
+UTIL_LINUX_RELEASE 	:= v2.27.1
+UTIL_LINUX_GIT_PATH := https://github.com/karelzak/util-linux.git
+
+NCURSES_DIR := ncurses
+NCURSES_RELEASE 	:= 
+NCURSES_GIT_PATH 	:= https://github.com/mirror/ncurses.git
+
+#all: prepare $(LIBFFI_DIR) $(UTIL_LINUX_DIR) $(GLIB_DIR)
+all: prepare 
+
+
 
 prepare:
 	$(MKDIR) $(BUILD_DIR) $(INSTALL_DIR)
-	$(MKDIR) $(BUILD_DIR)/$(LIBFFI_DIR)
-	$(MKDIR) $(BUILD_DIR)/$(GLIB_DIR)
+
+$(UTIL_LINUX_DIR): $(UTIL_LINUX_DIR)-make
+
+$(UTIL_LINUX_DIR)-src:
+	$(ECHO) $(DOWNLOAD_INFO)
+ifneq ($(UTIL_LINUX_DIR), $(wildcard $(UTIL_LINUX_DIR)))
+	git clone $(UTIL_LINUX_GIT_PATH)
+	cd $(@:-src=) && git co -b dev $(UTIL_LINUX_RELEASE)
+endif
+
+$(UTIL_LINUX_DIR)-make:
+	$(MKDIR) $(BUILD_DIR)/$(@:-make=)
+ifneq ($(UTIL_LINUX_DIR)/configure, $(wildcard $(UTIL_LINUX_DIR)/configure))
+	cd $(@:-make=) && ./autogen.sh
+endif
+	cd $(BUILD_DIR)/$(@:-make=) \
+		&& $(ROOT)/$(@:-make=)/configure --host=$(HOST) --prefix=$(PREFIX) CC=$(CC) \
+		&& $(MAKE) && make install
 
 #$(GLIB_DIR): $(GLIB_DIR)-src
 $(GLIB_DIR): $(GLIB_DIR)-src $(GLIB_DIR)-make
@@ -92,6 +118,7 @@ ZLIB_CFLAGS 	:= '-I$(COM_LIB_DIR)/include'
 ZLIB_LIBS 		:= '-lz -L$(COM_LIB_DIR)/lib'
 
 $(GLIB_DIR)-make:
+	$(MKDIR) $(BUILD_DIR)/$(@:-make=)
 ifneq ($(GLIB_DIR)/configure, $(wildcard $(GLIB_DIR)/configure))
 	cd $(@:-make=) && ./autogen.sh
 endif
@@ -119,6 +146,7 @@ ifneq ($(LIBFFI_DIR), $(wildcard $(LIBFFI_DIR)))
 endif
 
 $(LIBFFI_DIR)-make:
+	$(MKDIR) $(BUILD_DIR)/$(@:-make=)
 ifneq ($(LIBFFI_DIR)/configure, $(wildcard $(LIBFFI_DIR)/configure))
 	cd $(@:-make=) && ./autogen.sh
 endif
